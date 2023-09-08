@@ -1,10 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PicLogin, Logo } from "../assets";
 import FormInput from "../components/FormInput";
+import { useSelector, useDispatch } from "react-redux";
+import { login, register } from "../store/authSlicer";
+import toast, { Toaster } from "react-hot-toast";
 
 const Auth = () => {
+  const dispatch = useDispatch();
+  const { errorMessageAuth, successMessageAuth } = useSelector(
+    (state) => state.auth
+  );
   const [formType, setFormType] = useState("Login");
-
   const [registerValue, setRegisterValue] = useState({
     namaDepan: "",
     namaBelakang: "",
@@ -12,7 +18,6 @@ const Auth = () => {
     password: "",
     konfirmasiPassword: "",
   });
-
   const [loginValue, setLoginValue] = useState({
     email: "",
     password: "",
@@ -89,6 +94,19 @@ const Auth = () => {
     },
   ];
 
+  useEffect(() => {
+    if (successMessageAuth) {
+      toast.success(successMessageAuth);
+      setFormType("Login");
+    }
+  }, [successMessageAuth]);
+
+  useEffect(() => {
+    if (errorMessageAuth) {
+      toast.error(errorMessageAuth);
+    }
+  }, [errorMessageAuth]);
+
   const handleOnChangeLogin = (e) => {
     setLoginValue({ ...loginValue, [e.target.name]: e.target.value });
   };
@@ -123,8 +141,24 @@ const Auth = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("REGISTER", registerValue);
-    console.log("LOGIN", loginValue);
+    formType === "Login" ? doLogin() : doRegister();
+  };
+  const doLogin = () => {
+    const payloads = loginValue;
+    dispatch(login(payloads)).then(() => {
+      // if (errorMessageAuth) toast.error(errorMessageAuth);
+    });
+  };
+  const doRegister = () => {
+    const payloads = {
+      email: registerValue.email,
+      first_name: registerValue.namaDepan,
+      last_name: registerValue.namaBelakang,
+      password: registerValue.password,
+    };
+    dispatch(register(payloads)).then(() => {
+      // if (errorMessageAuth) toast.error(errorMessageAuth);
+    });
   };
   const formDesc =
     formType === "Login"
@@ -132,6 +166,18 @@ const Auth = () => {
       : "Lengkapi data untuk membuat akun";
   return (
     <div className="flex justify-center max-h-screen">
+      <Toaster
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: "#fff",
+            color: "#333",
+            textAlign: "left",
+            fontSize: "14px",
+            padding: "20px",
+          },
+        }}
+      />
       <div className="container">
         <div className="grid grid-cols-2 mdmax:grid-cols-1 mdmax:p-10">
           <div className="flex justify-center items-center">
