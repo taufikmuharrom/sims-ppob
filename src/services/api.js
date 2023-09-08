@@ -16,14 +16,12 @@ const getAuthHeader = () => {
 // AUTHENTICATION
 const registrationApi = (payloads) => {
   return axiosInstance.post("registration", payloads).then((response) => {
-    console.log("registration", response);
     return response;
   });
 };
 
 const loginApi = (payloads) => {
   return axiosInstance.post("login", payloads).then((response) => {
-    console.log("login", response);
     return response;
   });
 };

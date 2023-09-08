@@ -41,48 +41,36 @@ const initialState = {
   successMessageAuth: "",
   errorMessageAuth: "",
   statusCode: 500,
+  isLoggedIn: false,
 };
-/*
-{
-    "status": 0,
-    "message": "Login Sukses",
-    "data": {
-        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAbnV0ZWNoLWludGVncmFzaS5jb20iLCJtZW1iZXJDb2RlIjoiTExLUjZKTDEiLCJpYXQiOjE2OTQxNTkwNjUsImV4cCI6MTY5NDIwMjI2NX0.buTVHongBltbxs77hjNH9Ld9YDfXCgNC2kS1VaPWcA8"
-    }
-}
-*/
 
 const authSlicer = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    logout() {
+    logout(state) {
       localStorage.removeItem("token");
+      state.isLoggedIn = false;
+      console.log("TES", state.isLoggedIn);
     },
   },
   extraReducers: {
     [login.fulfilled]: (state, action) => {
-      console.log("extraReducers login fulfilled", action);
-      if (action?.payload?.status === 200) {
-        state.errorMessageAuth = "";
-        localStorage.setItem("token", action?.payload?.data?.data?.token);
-      } else {
-        state.errorMessageAuth = "Failed!";
-      }
+      state.statusCode = action?.payload?.status;
+      state.isLoggedIn = true;
     },
     [login.rejected]: (state, action) => {
       state.successMessageAuth = "";
       state.errorMessageAuth = action.payload;
+      state.statusCode = action?.payload?.status;
     },
     [register.fulfilled]: (state, action) => {
-      if (action.payload.status === 200) {
-        state.successMessageAuth = action.payload.data.message;
-      } else {
-        state.errorMessageAuth = "Failed!";
-      }
+      state.successMessageAuth = action.payload.data.message;
+      state.statusCode = action?.payload?.status;
     },
     [register.rejected]: (state, action) => {
       state.errorMessageAuth = action.payload;
+      state.statusCode = action?.payload?.status;
     },
   },
 });

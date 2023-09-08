@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { PicLogin, Logo } from "../assets";
 import FormInput from "../components/FormInput";
 import { useSelector, useDispatch } from "react-redux";
 import { login, register } from "../store/authSlicer";
 import toast, { Toaster } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const Auth = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { errorMessageAuth, successMessageAuth } = useSelector(
     (state) => state.auth
@@ -145,8 +147,21 @@ const Auth = () => {
   };
   const doLogin = () => {
     const payloads = loginValue;
-    dispatch(login(payloads)).then(() => {
-      // if (errorMessageAuth) toast.error(errorMessageAuth);
+    dispatch(login(payloads)).then((res) => {
+      if (res?.payload?.status === 200) {
+        const token = res?.payload?.data?.data?.token;
+        saveTokenToLocalStorage(token).then(() => {
+          // navigate("/");
+          window.location.reload(false);
+        });
+      }
+    });
+  };
+
+  const saveTokenToLocalStorage = (token) => {
+    return new Promise((resolve) => {
+      localStorage.setItem("token", token);
+      resolve(true);
     });
   };
   const doRegister = () => {
@@ -156,9 +171,7 @@ const Auth = () => {
       last_name: registerValue.namaBelakang,
       password: registerValue.password,
     };
-    dispatch(register(payloads)).then(() => {
-      // if (errorMessageAuth) toast.error(errorMessageAuth);
-    });
+    dispatch(register(payloads));
   };
   const formDesc =
     formType === "Login"
@@ -182,7 +195,6 @@ const Auth = () => {
         <div className="grid grid-cols-2 mdmax:grid-cols-1 mdmax:p-10">
           <div className="flex justify-center items-center">
             <div className="max-h-fit space-y-5">
-              {/* LOGO & TITLE*/}
               <div className="flex justify-center gap-2 items-center font-bold">
                 <img src={Logo} /> <h1>SIMS PPOB</h1>
               </div>
