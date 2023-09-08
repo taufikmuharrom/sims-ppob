@@ -2,8 +2,6 @@
 /* eslint-disable react/no-unknown-property */
 import React, { useState } from "react";
 
-import "./FormInput.css";
-
 const FormInput = ({
   label,
   onChange,

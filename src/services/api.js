@@ -30,6 +30,16 @@ const getProfileApi = () => {
 };
 
 // TRANSACTION
+const historyApi = () => {
+  return axiosInstance
+    .get("transaction/history", {
+      headers: setJwtHeader,
+    })
+    .then((response) => {
+      return response;
+    });
+};
+
 const balanceApi = () => {
   return axiosInstance
     .get("balance", {
@@ -43,6 +53,16 @@ const balanceApi = () => {
 const paymentApi = (payloads) => {
   return axiosInstance
     .post("transaction", payloads, {
+      headers: setJwtHeader,
+    })
+    .then((response) => {
+      return response;
+    });
+};
+
+const topUpApi = (payloads) => {
+  return axiosInstance
+    .post("topup", payloads, {
       headers: setJwtHeader,
     })
     .then((response) => {
@@ -79,4 +99,6 @@ export {
   serviceApi,
   bannerApi,
   paymentApi,
+  historyApi,
+  topUpApi,
 };
