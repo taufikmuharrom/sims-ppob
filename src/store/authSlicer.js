@@ -93,7 +93,6 @@ const authSlicer = createSlice({
     [getProfile.fulfilled]: (state, action) => {
       const user = action?.payload?.data?.data;
       localStorage.setItem("user", JSON.stringify(user));
-      console.log("user", user);
       state.user = user;
       state.statusCode = action?.payload?.status;
     },

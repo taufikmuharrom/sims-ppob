@@ -30,7 +30,6 @@ const getProfileApi = () => {
 };
 
 // TRANSACTION
-
 const balanceApi = () => {
   return axiosInstance
     .get("balance", {
@@ -41,4 +40,28 @@ const balanceApi = () => {
     });
 };
 
-export { registrationApi, loginApi, getProfileApi, balanceApi };
+// INFORMATION
+const serviceApi = () => {
+  return axiosInstance
+    .get("services", {
+      headers: setJwtHeader,
+    })
+    .then((response) => {
+      return response;
+    });
+};
+
+const bannerApi = () => {
+  return axiosInstance.get("banner").then((response) => {
+    return response;
+  });
+};
+
+export {
+  registrationApi,
+  loginApi,
+  getProfileApi,
+  balanceApi,
+  serviceApi,
+  bannerApi,
+};
