@@ -1,4 +1,4 @@
-import toast, { Toaster } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 import Navbar from "./Navbar";
 import { Routes, Route } from "react-router-dom";
 import appRoutes from "../routes";

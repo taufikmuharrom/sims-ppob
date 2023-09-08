@@ -1,19 +1,12 @@
 import axios from "axios";
-// import authHeader from '../../Helper/auth-header'
 const axiosInstance = axios.create({
   baseURL: "https://take-home-test-api.nutech-integrasi.app/",
 });
 
-const getAuthHeader = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  if (user && user.token) {
-    return { Authorization: "Bearer " + user.token };
-  } else {
-    return {};
-  }
-};
+const getToken = localStorage.getItem("token");
+const setJwtHeader = getToken ? { Authorization: "Bearer " + getToken } : null;
 
-// AUTHENTICATION
+// MEMBERSHIP
 const registrationApi = (payloads) => {
   return axiosInstance.post("registration", payloads).then((response) => {
     return response;
@@ -26,32 +19,26 @@ const loginApi = (payloads) => {
   });
 };
 
-export { registrationApi, loginApi };
+const getProfileApi = () => {
+  return axiosInstance
+    .get("profile", {
+      headers: setJwtHeader,
+    })
+    .then((response) => {
+      return response;
+    });
+};
 
-// const AVAILABILITY = '/expert/schedule-setting/'
+// TRANSACTION
 
-// const getAvailability = (customerId) => {
-//     return axiosInstance
-//         .get(AVAILABILITY + `${customerId}/available`, {
-//             headers: authHeader()
-//         })
-//         .then((response) => {
-//             return response.data
-//         })
-// }
+const balanceApi = () => {
+  return axiosInstance
+    .get("balance", {
+      headers: setJwtHeader,
+    })
+    .then((response) => {
+      return response;
+    });
+};
 
-// const setAvailability = (customerId,payloads) => {
-//     return axiosInstance
-//         .patch(AVAILABILITY + `${customerId}/update`,payloads, {
-//             headers: authHeader()
-//         })
-//         .then((response) => {
-//             return response.data
-//         })
-// }
-
-// const availabilityService = {
-//     getAvailability,
-//     setAvailability
-// }
-// export default availabilityService
+export { registrationApi, loginApi, getProfileApi, balanceApi };

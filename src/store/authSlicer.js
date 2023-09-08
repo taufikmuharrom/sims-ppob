@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { loginApi, registrationApi } from "../services/api";
+import { getProfileApi, loginApi, registrationApi } from "../services/api";
 
 export const login = createAsyncThunk(
   "auth/login",
@@ -37,11 +37,30 @@ export const register = createAsyncThunk(
   }
 );
 
+export const getProfile = createAsyncThunk(
+  "auth/getProfile",
+  async (payloads, thunkAPI) => {
+    try {
+      const data = await getProfileApi();
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 const initialState = {
   successMessageAuth: "",
   errorMessageAuth: "",
   statusCode: 500,
   isLoggedIn: false,
+  user: null,
 };
 
 const authSlicer = createSlice({
@@ -51,7 +70,6 @@ const authSlicer = createSlice({
     logout(state) {
       localStorage.removeItem("token");
       state.isLoggedIn = false;
-      console.log("TES", state.isLoggedIn);
     },
   },
   extraReducers: {
@@ -69,6 +87,17 @@ const authSlicer = createSlice({
       state.statusCode = action?.payload?.status;
     },
     [register.rejected]: (state, action) => {
+      state.errorMessageAuth = action.payload;
+      state.statusCode = action?.payload?.status;
+    },
+    [getProfile.fulfilled]: (state, action) => {
+      const user = action?.payload?.data?.data;
+      localStorage.setItem("user", JSON.stringify(user));
+      console.log("user", user);
+      state.user = user;
+      state.statusCode = action?.payload?.status;
+    },
+    [getProfile.rejected]: (state, action) => {
       state.errorMessageAuth = action.payload;
       state.statusCode = action?.payload?.status;
     },
