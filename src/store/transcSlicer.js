@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { balanceApi } from "../services/api";
+import { balanceApi, paymentApi } from "../services/api";
 
 export const getBalance = createAsyncThunk(
   "transc/getBalance",
@@ -19,8 +19,27 @@ export const getBalance = createAsyncThunk(
   }
 );
 
+export const createPayment = createAsyncThunk(
+  "transc/createPayment",
+  async (payloads, thunkAPI) => {
+    try {
+      const data = await paymentApi(payloads);
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 const initialState = {
   balance: "",
+  successMessageTransc: "",
   errorMessageTransc: "",
 };
 
@@ -33,6 +52,13 @@ const transcSlicer = createSlice({
       state.balance = balance;
     },
     [getBalance.rejected]: (state, action) => {
+      state.errorMessageTransc = action.payload;
+    },
+    [createPayment.fulfilled]: (state, action) => {
+      const message = action?.payload?.data?.message;
+      state.successMessageTransc = message;
+    },
+    [createPayment.rejected]: (state, action) => {
       state.errorMessageTransc = action.payload;
     },
   },

@@ -4,17 +4,22 @@ import { getProfile } from "../store/authSlicer";
 import { ProfilePhoto } from "../assets";
 import { BsFillEyeFill } from "react-icons/bs";
 import toast from "react-hot-toast";
-import { getBalance } from "../store/transcSlicer";
+import { createPayment, getBalance } from "../store/transcSlicer";
 import { getBanners, getServices } from "../store/infoSlicer";
+import { useParams } from "react-router-dom";
 
 const Dashboard = () => {
+  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  const { balance, errorMessageTransc } = useSelector((state) => state.transc);
+  const { balance, successMessageTransc, errorMessageTransc } = useSelector(
+    (state) => state.transc
+  );
   const { serviceList, bannerList, errorMessageInfo } = useSelector(
     (state) => state.info
   );
-  const dispatch = useDispatch();
+
   const [inputType, setInputType] = useState("password");
+  const [serviceDetail, setServiceDetail] = useState(null);
 
   useEffect(() => {
     dispatch(getProfile());
@@ -30,20 +35,19 @@ const Dashboard = () => {
     if (errorMessageInfo) {
       toast.error(errorMessageInfo);
     }
-  }, [errorMessageTransc, errorMessageInfo]);
+    if (successMessageTransc) {
+      toast.success(successMessageTransc);
+      setServiceDetail(null);
+      dispatch(getBalance());
+    }
+  }, [errorMessageTransc, errorMessageInfo, successMessageTransc]);
 
-  //   {
-  //     "service_code": "PAJAK",
-  //     "service_name": "Pajak PBB",
-  //     "service_icon": "https://minio.nutech-integrasi.app/take-home-test/services/PBB.png",
-  //     "service_tariff": 40000
-  // }
-
-  //   {
-  //     "banner_name": "Banner 1",
-  //     "banner_image": "https://minio.nutech-integrasi.app/take-home-test/banner/Banner-1.png",
-  //     "description": "Lerem Ipsum Dolor sit amet"
-  // }
+  const payService = () => {
+    const payloads = {
+      service_code: serviceDetail.service_code,
+    };
+    dispatch(createPayment(payloads));
+  };
 
   return (
     <div className="mt-7 space-y-10">
@@ -89,36 +93,70 @@ const Dashboard = () => {
         </div>
       </div>
       {/* SERVICES */}
-      <div className="grid grid-cols-12 gap-1">
-        {serviceList &&
-          serviceList.map((service) => {
-            return (
-              <div
-                key={service.service_code}
-                className="cursor-pointer hover:scale-110"
-              >
-                <img src={service.service_icon} />
-                <p className="text-xs text-center pr-6">
-                  {service.service_name}
-                </p>
-              </div>
-            );
-          })}
-      </div>
-      {/* BANNER */}
-      <div className="space-y-5">
-        <h1 className="font-semibold">Temukan promo menarik</h1>
-        <div className="flex justify-between overflow-y-auto gap-3">
-          {bannerList &&
-            bannerList.map((banner) => {
+      {!serviceDetail && (
+        <div className="grid grid-cols-12 gap-1">
+          {serviceList &&
+            serviceList.map((service) => {
               return (
-                <div key={banner.name} className="cursor-pointer ">
-                  <img src={banner.banner_image} />
+                <div
+                  key={service.service_code}
+                  className="cursor-pointer hover:scale-110"
+                  onClick={() => {
+                    setServiceDetail(service);
+                  }}
+                >
+                  <img src={service.service_icon} />
+                  <p className="text-xs text-center pr-6">
+                    {service.service_name}
+                  </p>
                 </div>
               );
             })}
         </div>
-      </div>
+      )}
+      {/* BANNER */}
+      {!serviceDetail && (
+        <div className="space-y-5">
+          <h1 className="font-semibold">Temukan promo menarik</h1>
+          <div className="flex justify-between overflow-y-auto gap-3">
+            {bannerList &&
+              bannerList.map((banner) => {
+                return (
+                  <div key={banner.name} className="cursor-pointer ">
+                    <img src={banner.banner_image} />
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+      )}
+      {/* SERVICE DETAILS */}
+      {serviceDetail && (
+        <div className="space-y-4">
+          <h1>Pembayaran</h1>
+          <div className="flex gap-3 items-center">
+            <img src={serviceDetail.service_icon} className="w-10 h-10" />
+            <h1 className="font-bold">{serviceDetail.service_name}</h1>
+          </div>
+          <div className="inputField">
+            <input value={serviceDetail.service_tariff} disabled />
+          </div>
+          <button
+            className="bg-red-500 w-full hover:bg-red-700 text-white font-medium py-2 px-4 rounded"
+            onClick={payService}
+          >
+            Bayar
+          </button>
+          <button
+            className="border-red-500 border bg-white w-full hover:opacity-50 text-red-500 font-medium py-2 px-4 rounded"
+            onClick={() => {
+              setServiceDetail(null);
+            }}
+          >
+            Kembali
+          </button>
+        </div>
+      )}
     </div>
   );
 };

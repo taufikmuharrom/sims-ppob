@@ -40,6 +40,16 @@ const balanceApi = () => {
     });
 };
 
+const paymentApi = (payloads) => {
+  return axiosInstance
+    .post("transaction", payloads, {
+      headers: setJwtHeader,
+    })
+    .then((response) => {
+      return response;
+    });
+};
+
 // INFORMATION
 const serviceApi = () => {
   return axiosInstance
@@ -68,4 +78,5 @@ export {
   balanceApi,
   serviceApi,
   bannerApi,
+  paymentApi,
 };
