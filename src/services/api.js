@@ -52,9 +52,13 @@ const serviceApi = () => {
 };
 
 const bannerApi = () => {
-  return axiosInstance.get("banner").then((response) => {
-    return response;
-  });
+  return axiosInstance
+    .get("banner", {
+      headers: setJwtHeader,
+    })
+    .then((response) => {
+      return response;
+    });
 };
 
 export {

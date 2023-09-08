@@ -5,12 +5,14 @@ import { ProfilePhoto } from "../assets";
 import { BsFillEyeFill } from "react-icons/bs";
 import toast from "react-hot-toast";
 import { getBalance } from "../store/transcSlicer";
-import { getServices } from "../store/infoSlicer";
+import { getBanners, getServices } from "../store/infoSlicer";
 
 const Dashboard = () => {
   const { user } = useSelector((state) => state.auth);
   const { balance, errorMessageTransc } = useSelector((state) => state.transc);
-  const { serviceList, errorMessageInfo } = useSelector((state) => state.info);
+  const { serviceList, bannerList, errorMessageInfo } = useSelector(
+    (state) => state.info
+  );
   const dispatch = useDispatch();
   const [inputType, setInputType] = useState("password");
 
@@ -18,6 +20,7 @@ const Dashboard = () => {
     dispatch(getProfile());
     dispatch(getBalance());
     dispatch(getServices());
+    dispatch(getBanners());
   }, []);
 
   useEffect(() => {
@@ -34,6 +37,12 @@ const Dashboard = () => {
   //     "service_name": "Pajak PBB",
   //     "service_icon": "https://minio.nutech-integrasi.app/take-home-test/services/PBB.png",
   //     "service_tariff": 40000
+  // }
+
+  //   {
+  //     "banner_name": "Banner 1",
+  //     "banner_image": "https://minio.nutech-integrasi.app/take-home-test/banner/Banner-1.png",
+  //     "description": "Lerem Ipsum Dolor sit amet"
   // }
 
   return (
@@ -95,6 +104,20 @@ const Dashboard = () => {
               </div>
             );
           })}
+      </div>
+      {/* BANNER */}
+      <div className="space-y-5">
+        <h1 className="font-semibold">Temukan promo menarik</h1>
+        <div className="flex justify-between overflow-y-auto gap-3">
+          {bannerList &&
+            bannerList.map((banner) => {
+              return (
+                <div key={banner.name} className="cursor-pointer ">
+                  <img src={banner.banner_image} />
+                </div>
+              );
+            })}
+        </div>
       </div>
     </div>
   );

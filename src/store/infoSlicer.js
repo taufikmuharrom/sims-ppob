@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { serviceApi } from "../services/api";
+import { bannerApi, serviceApi } from "../services/api";
 
 export const getServices = createAsyncThunk(
   "info/getServices",
@@ -19,8 +19,27 @@ export const getServices = createAsyncThunk(
   }
 );
 
+export const getBanners = createAsyncThunk(
+  "info/getBanners",
+  async (payloads, thunkAPI) => {
+    try {
+      const data = await bannerApi();
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 const initialState = {
-  serviceList: "",
+  serviceList: [],
+  bannerList: [],
   errorMessageInfo: "",
 };
 
@@ -33,6 +52,13 @@ const transcSlicer = createSlice({
       state.serviceList = serviceList;
     },
     [getServices.rejected]: (state, action) => {
+      state.errorMessageInfo = action.payload;
+    },
+    [getBanners.fulfilled]: (state, action) => {
+      const bannerList = action?.payload?.data?.data;
+      state.bannerList = bannerList;
+    },
+    [getBanners.rejected]: (state, action) => {
       state.errorMessageInfo = action.payload;
     },
   },
